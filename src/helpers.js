@@ -48,8 +48,9 @@ export function orderRecord(id) {
   if (!order) return null;
 
   order.items = db.prepare(`
-    SELECT oi.*, c.name chef_name, b.name bartender_name
+    SELECT oi.*, mi.category, c.name chef_name, b.name bartender_name
     FROM order_items oi
+    LEFT JOIN menu_items mi ON mi.id = oi.menu_item_id
     LEFT JOIN staff c ON c.id = oi.chef_id
     LEFT JOIN staff b ON b.id = oi.bartender_id
     WHERE oi.order_id = ?

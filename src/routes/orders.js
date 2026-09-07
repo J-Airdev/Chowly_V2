@@ -92,10 +92,22 @@ router.patch('/orders/:id', auth, waiter, (req, res) => {
   }
 
   const validStaff = (id, role) => !id || db.prepare('SELECT id FROM staff WHERE id=? AND role=? AND restaurant_id=?').get(id, role, order.restaurant_id);
+  const getItemCategory = db.prepare('SELECT mi.category FROM order_items oi JOIN menu_items mi ON mi.id = oi.menu_item_id WHERE oi.id = ?');
 
   for (const item of item_assignments) {
-    if (!validStaff(item.chef_id, 'chef') || !validStaff(item.bartender_id, 'bartender')) {
-      return res.status(400).json({ error: 'Assigned staff must belong to this restaurant and role.' });
+    const catRow = getItemCategory.get(item.id);
+    const category = catRow ? catRow.category : 'food';
+
+    if (category === 'drink') {
+      item.chef_id = null;
+      if (!validStaff(item.bartender_id, 'bartender')) {
+        return res.status(400).json({ error: 'Assigned bartender must belong to this restaurant and role.' });
+      }
+    } else {
+      item.bartender_id = null;
+      if (!validStaff(item.chef_id, 'chef')) {
+        return res.status(400).json({ error: 'Assigned chef must belong to this restaurant and role.' });
+      }
     }
   }
 

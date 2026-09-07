@@ -57,14 +57,17 @@ export async function orderPage(id) {
 }
 
 function waiterFields(i) {
-  return `
-    <select data-chef="${i.id}"><option value="">Chef</option></select>
-    <select data-bartender="${i.id}"><option value="">Bartender</option></select>
-  `;
+  if (i.category === 'drink') {
+    return `<select data-bartender="${i.id}"><option value="">Bartender</option></select>`;
+  }
+  return `<select data-chef="${i.id}"><option value="">Chef</option></select>`;
 }
 
 function staffAssignments(i) {
-  return `${i.chef_name ? `Chef: ${esc(i.chef_name)}` : 'Chef: Unassigned'} · ${i.bartender_name ? `Bar: ${esc(i.bartender_name)}` : 'Bar: Unassigned'}`;
+  if (i.category === 'drink') {
+    return i.bartender_name ? `Bar: ${esc(i.bartender_name)}` : 'Bar: Unassigned';
+  }
+  return i.chef_name ? `Chef: ${esc(i.chef_name)}` : 'Chef: Unassigned';
 }
 
 function waiterPanel() {
@@ -127,19 +130,27 @@ async function setupWaiter(o) {
     const chef = document.querySelector(`[data-chef="${item.id}"]`);
     const bar = document.querySelector(`[data-bartender="${item.id}"]`);
     
-    chef.innerHTML += staff.filter(x => x.role === 'chef').map(x => `<option value="${x.id}" ${x.id === item.chef_id ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
-    bar.innerHTML += staff.filter(x => x.role === 'bartender').map(x => `<option value="${x.id}" ${x.id === item.bartender_id ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
+    if (chef) {
+      chef.innerHTML += staff.filter(x => x.role === 'chef').map(x => `<option value="${x.id}" ${x.id === item.chef_id ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
+    }
+    if (bar) {
+      bar.innerHTML += staff.filter(x => x.role === 'bartender').map(x => `<option value="${x.id}" ${x.id === item.bartender_id ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
+    }
   }
   
   document.querySelector('#order-status').value = o.status;
   
   document.querySelector('#save-service').onclick = async () => {
     try {
-      const item_assignments = o.items.map(i => ({
-        id: i.id,
-        chef_id: Number(document.querySelector(`[data-chef="${i.id}"]`).value) || null,
-        bartender_id: Number(document.querySelector(`[data-bartender="${i.id}"]`).value) || null
-      }));
+      const item_assignments = o.items.map(i => {
+        const chefSelect = document.querySelector(`[data-chef="${i.id}"]`);
+        const barSelect = document.querySelector(`[data-bartender="${i.id}"]`);
+        return {
+          id: i.id,
+          chef_id: chefSelect ? (Number(chefSelect.value) || null) : null,
+          bartender_id: barSelect ? (Number(barSelect.value) || null) : null
+        };
+      });
       
       await api(`/api/orders/${o.id}`, {
         method: 'PATCH',
