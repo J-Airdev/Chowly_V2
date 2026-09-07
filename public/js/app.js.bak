@@ -1,0 +1,94 @@
+import { state, saveState, clearCart } from './state.js';
+import { api } from './api.js';
+import { esc, toast } from './utils.js';
+import { registerPage, navigate } from './navigation.js';
+import { menuPage } from './pages/menu.js';
+import { ordersPage } from './pages/orders.js';
+import { orderPage } from './pages/order-detail.js';
+
+// DOM Elements
+const restaurantSelect = document.querySelector('#restaurant-select');
+const roleSwitch = document.querySelector('.role-switch');
+const roleButtons = [...document.querySelectorAll('[data-role]')];
+
+export function updateNavigation() {
+  const waiter = state.user?.role === 'waiter';
+  document.querySelector('[data-page="menu"]').hidden = false;
+  document.querySelector('[data-page="payment"]').hidden = waiter;
+  
+  const orders = document.querySelector('[data-page="orders"]');
+  orders.innerHTML = `<i>≡</i> ${waiter ? 'Order Queue' : 'My Orders'}`;
+}
+
+function renderRole() {
+  roleSwitch.dataset.active = state.user?.role || 'customer';
+  
+  roleButtons.forEach(button => {
+    const active = button.dataset.role === state.user?.role;
+    button.classList.toggle('active-role', active);
+    button.setAttribute('aria-pressed', String(active));
+    
+    button.onclick = () => activateRole(button.dataset.role);
+  });
+  
+  updateNavigation();
+}
+
+export async function activateRole(role) {
+  try {
+    const data = await api('/api/demo-session', {
+      method: 'POST',
+      body: JSON.stringify({
+        role,
+        restaurant_slug: state.restaurant
+      })
+    });
+    
+    state.user = data.user;
+    state.token = data.token;
+    saveState();
+    renderRole();
+    
+    if (role === 'waiter') {
+      navigate('orders');
+    } else {
+      navigate('menu');
+    }
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+async function loadRestaurants() {
+  const restaurants = await api('/api/restaurants');
+  
+  restaurantSelect.innerHTML = restaurants.map(r => `
+    <option value="${r.slug}" ${r.slug === state.restaurant ? 'selected' : ''}>
+      ${esc(r.name)}
+    </option>
+  `).join('');
+  
+  restaurantSelect.onchange = async () => {
+    state.restaurant = restaurantSelect.value;
+    clearCart();
+    saveState();
+    await activateRole(state.user?.role || 'customer');
+  };
+}
+
+// Register pages
+registerPage('menu', menuPage);
+registerPage('orders', () => ordersPage());
+registerPage('payment', () => ordersPage(true));
+registerPage('orderDetail', orderPage);
+
+// Navigation setup
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.onclick = () => {
+    navigate(btn.dataset.page);
+  };
+});
+
+// Init
+await loadRestaurants();
+await activateRole(state.user?.role || 'customer');

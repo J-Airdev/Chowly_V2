@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Chowly - Digital dining platform">
+  <title>Chowly | Digital dining</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#">chowly<span>.</span></a>
+    <p class="eyebrow">DIGITAL DINING</p>
+    <nav>
+      <button class="nav-item active" data-page="menu"><i>⌂</i> Menu</button>
+      <button class="nav-item" data-page="orders"><i>≡</i> Orders</button>
+      <button class="nav-item" data-page="payment"><i>₦</i> Payment</button>
+    </nav>
+    <div class="sidebar-note">
+      <strong>One platform.</strong><br>
+      Every table, every restaurant.
+    </div>
+  </aside>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">WELCOME TO</p>
+        <h1 id="restaurant-name">Chowly</h1>
+      </div>
+      <div class="header-actions">
+        <select id="restaurant-select" aria-label="Choose restaurant"></select>
+        <div class="role-switch" aria-label="Choose app role">
+          <button data-role="customer">Customer</button>
+          <button data-role="waiter">Waiter</button>
+        </div>
+      </div>
+    </header>
+    <div id="app"></div>
+  </main>
+  <div id="toast" role="status"></div>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
