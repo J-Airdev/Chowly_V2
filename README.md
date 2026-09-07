@@ -31,24 +31,6 @@ cp .env.example .env
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Environment Variables
-
-| Variable     | Required    | Description                                |
-| ------------ | ----------- | ------------------------------------------ |
-| `PORT`       | No          | Server port (default: `3000`)              |
-| `JWT_SECRET` | Production  | Secret key for signing JWTs                |
-| `NODE_ENV`   | No          | Set to `production` for strict secret enforcement |
-
-### Demo Accounts
-
-The app seeds demo credentials on first run:
-
-| Role     | Email                      | Password       |
-| -------- | -------------------------- | -------------- |
-| Customer | `customer@chowly.test`     | `customer123`  |
-| Waiter   | `waiter@chowly.test`       | `waiter123`    |
 
 ## Project Structure
 
@@ -110,17 +92,11 @@ chowly/
 | `POST`   | `/api/orders/:id/payments`      | Customer | Record pretend payment             |
 | `DELETE` | `/api/orders/:id`               | Customer | Remove from customer history       |
 
-## Deployment
 
-1. Push this repository to GitHub
-2. Set `JWT_SECRET` and `NODE_ENV=production` in your host's environment variables
-3. Deploy as a Node web service (e.g. Render, Railway, Fly.io)
-4. Build command: `npm install`
-5. Start command: `npm start`
+. Build command: `npm install`
+. Start command: `npm start`
 
 > **Note:** SQLite stores data on the local filesystem. For production, either attach
 > a persistent disk or migrate to PostgreSQL.
 
 ## AI Use Disclosure
-
-AI was used to turn the assignment's user story into the application structure, API endpoints, database schema, and initial UI. The resulting implementation was reviewed to ensure customer-only ordering/payment/feedback and waiter-only staff assignment are enforced by the backend, not just hidden in the screen.
