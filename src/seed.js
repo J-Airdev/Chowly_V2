@@ -99,6 +99,7 @@ export function seed() {
   db.prepare('UPDATE menu_items SET image_url=? WHERE restaurant_id=? AND name=?').run('/assets/pineapple-banana-smoothie.png', jj.id, 'Pineapple and bananna smoothie');
   db.prepare('UPDATE menu_items SET image_url=? WHERE restaurant_id=? AND name=?').run('/assets/watermelon-smoothie.png', jj.id, 'Watermelon smoothie');
   db.prepare('UPDATE menu_items SET image_url=? WHERE restaurant_id=? AND name=?').run('/assets/tigernut-smoothie.png', jj.id, 'Tigernut smoothie');
+  db.prepare('UPDATE menu_items SET image_url=? WHERE restaurant_id=? AND name=?').run('/assets/ewa-agoyi-bread.png', jj.id, 'Ewa-agoyi with fresh baked bread');
 
   db.prepare('UPDATE menu_items SET available=0 WHERE restaurant_id=? AND name=?').run(jj.id, 'Chicken Shawarma');
 
